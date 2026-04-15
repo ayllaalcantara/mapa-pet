@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Georreferenciamento em Saúde</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+ #map {
+    height: 500px;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+     .legenda {
+      background: white;
+      padding: 10px;
+      line-height: 1.5;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+    var map = L.map('map').setView([-9.389, -40.503], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    function getCor(tipo) {
+        if (tipo == "vacina") return "green";
+        if (tipo == "comorbidade") return "red";
+        if (tipo == "abandono") return "yellow";
+        if (tipo == "notificacao") return "blue";
+        if (tipo == "absenteismo") return "purple";
+    }
+  
+  var dados = [
+   
+    {lat: -9.27050553770812, lng: -40.5994564, tipo: "vacina", unidade: "UBS Centro", info: "130 vacinados"},
+    {lat: -9.3850569, lng: -40.4931040, tipo: "vacina", unidade: "UBS Areia Branca", info: "95 vacinados"},
+
+    {lat: -9.3569145, lng: -40.54212, tipo: "comorbidade", unidade: "UBS João de Deus", info: "Alta incidência de diabetes"},
+    {lat: -9.381733, lng: -40.496887, tipo: "comorbidade", unidade: "UBS Alto do Cocar", info: "Hipertensão predominante"},
+
+    {lat: -9.3562678, lng:-40.4911652, tipo: "abandono", unidade: "UBS Dom Avelar", info: "6 casos de abandono"},
+    {lat: -9.3509293, lng: -40.5198245, tipo: "abandono", unidade: "UBS Pedra Linda", info: "4 casos registrados"},
+    
+    {lat: -9.3895, lng: -40.5175, tipo: "notificacao", unidade: "UBS Gercino Coelho", info: "12 casos notificados"},
+    {lat: -9.394596, lng: -40.4830265, tipo: "notificacao", unidade: "UBS Vila Eduardo", info: "8 registros recentes"},
+
+    {lat:-9.3849, lng: -40.5387, tipo: "absenteismo", unidade: "UBS Cohab Massangano", info: "15 faltas em consultas"},
+    {lat: -9.3962506, lng: -40.5493452, tipo: "absenteismo", unidade: "UBS Rio Corrente", info: "Alta taxa de ausência"},
+];
+    dados.forEach(function(dado) {
+
+        var icone = L.icon({
+            iconUrl: "https://maps.google.com/mapfiles/ms/icons/" + getCor(dado.tipo) + "-dot.png",
+            iconSize: [32, 32]
+        });
+
+        L.marker([dado.lat, dado.lng], {icon: icone})
+            .addTo(map)
+            .bindPopup(
+                "<b>Unidade:</b> " + dado.unidade + "<br>" +
+                "<b>Tipo:</b> " + dado.tipo + "<br>" +
+                "<b>Dados:</b> " + dado.info
+            );
+    });
+
+    var legenda = L.control({position: "bottomright"});
+
+    legenda.onAdd = function () {
+        var div = L.DomUtil.create("div", "legenda");
+
+        div.innerHTML += "<b>Legenda</b><br>";
+        div.innerHTML += "🟢 Vacinação<br>";
+        div.innerHTML += "🔴 Comorbidade<br>";
+        div.innerHTML += "🟡 Abandono<br>";
+        div.innerHTML += "🔵 Notificação<br>";
+        div.innerHTML += "🟣 Absenteísmo<br>";
+
+        return div;
+    };
+
+    legenda.addTo(map);
+
+</script>
+</body>
+</html>
